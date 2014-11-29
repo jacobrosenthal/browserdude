@@ -1,0 +1,15 @@
+{
+   "app": {
+      "background": {
+         "scripts": [ "bundle.js", "background.js"]
+      }
+   },
+   "description": "Upload to Arduino from Chrome",
+   "manifest_version": 2,
+   "name": "browserdude",
+   "permissions": 
+      [ 
+         "serial"
+      ],
+   "version": "0.0.1"
+}

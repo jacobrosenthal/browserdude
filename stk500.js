@@ -46,12 +46,14 @@ function upload(done){
 
 
 SerialPort.list(function (err, ports) {
+	var found = false;
   ports.forEach(function(port) {
 
     console.log("found " + port.comName);
 
     if(usbttyRE.test(port.comName))
     {
+    	found = true;
 
       console.log("trying" + port.comName);
 
@@ -75,8 +77,11 @@ SerialPort.list(function (err, ports) {
       ], function(error){
         if(error){
           console.log("programing FAILED: " + error);
+
+          done(new Error("programing FAILED: " + error));
         }else{
           console.log("programing SUCCESS!");
+          done();
         }
       });
 
@@ -85,6 +90,12 @@ SerialPort.list(function (err, ports) {
     }
 
   });
+
+	if(!found){
+		console.log("not found");
+		done(new Error("couldn't find an Arduino to program"));
+	}
+
 });
 
 }

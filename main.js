@@ -1,5 +1,14 @@
 var btn =  document.getElementById('test-button');
+var statusElement =  document.getElementById('status');
 
 btn.addEventListener('click', function () {
-  stk500.upload();
+  statusElement.innerHTML="programming...";
+
+  stk500.upload(function(error){
+  	if(error){
+  		statusElement.innerHTML=error.message;
+  		throw error;
+  	}
+  	statusElement.innerHTML="programming Success";
+  });
 });

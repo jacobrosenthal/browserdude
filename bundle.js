@@ -1574,9 +1574,6 @@ stk500.prototype.connect = function(done) {
 	console.log("connect");
 
 	var self = this;
-	
-	self.received = new Buffer(300);
-	self.receivedSize = 0;
 
 	this.serialPort.open(function (error) {
 
@@ -1585,6 +1582,10 @@ stk500.prototype.connect = function(done) {
 	    done(error);
 	  } else {
 	    console.log('connected');
+
+	    self.received = new Buffer(300);
+	    self.receivedSize = 0;
+
 	    self.serialPort.on('data', self.onDataCallback);
 	    done();
 	  }

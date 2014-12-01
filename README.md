@@ -10,7 +10,7 @@ Not sure how to implement long term. Ideally we'd just run in the browser and an
 Go to chrome://extensions/ and check developer mode in the upper right corner. Then load unpacked extension and choose this directory.
 
 ##Program:
-By default uploads StandardFirmata to the first Uno it can find. Launch the app from your Chrome Apps drawer. With your arduino plugged in, click Program on the window that opens. If you want more debug info, go to url chrome://extensions/ find browserdude, click background page, and open the console tab. You can type stk500.upload(); here instead of clicking the program button.
+By default uploads StandardFirmata to the first Uno it can find. Launch the app from your Chrome Apps drawer. With your arduino plugged in, click Program on the window that opens. If you want more debug info, right click and inspect element and open the console tab.
 
 ##Make Changes:
 If you make any changes to stk500.js you'll need to rebuild. Assuming you have node already instealled, download and install dependancies with:

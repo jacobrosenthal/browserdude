@@ -1494,6 +1494,7 @@ var Cmnd_STK_ENTER_PROGMODE = 0x50;
 var Cmnd_STK_LOAD_ADDRESS = 0x55;
 var Cmnd_STK_PROG_PAGE = 0x64;
 var Cmnd_STK_LEAVE_PROGMODE = 0x51;
+var Cmnd_STK_READ_SIGN = 0x75;
 
 var Sync_CRC_EOP = 0x20;
 
@@ -1531,6 +1532,33 @@ stk500.prototype.matchReceive = function(match, timeout, callback){
 
 	var self = this;
 
+	self.getBytes(match.length, timeout, function(error, data){
+
+		if(error)
+		{
+			callback(error);
+		}else{
+			var err = null;
+
+			if(bufferEqual(data, match)){
+				console.log(match.toString('hex') + "==" + data.toString('hex'));
+			}else{
+				console.log(match.toString('hex') + "!=" + data.toString('hex'));
+				err = new Error("No Match");
+				err.name = "INVALID";
+			}
+			callback(err, data);
+		}
+
+	});
+
+};
+
+stk500.prototype.getBytes = function(numberBytes, timeout, callback){
+	console.log("getBytes");
+
+	var self = this;
+
 	var interval = 10;
 	var elapsed = interval;
 
@@ -1543,28 +1571,22 @@ stk500.prototype.matchReceive = function(match, timeout, callback){
 			clearInterval(timer);
 			self.received = new Buffer(300);
 			self.receivedSize = 0;
-			callback("timed out after " + elapsed + "ms");
+
+			var err = new Error("Timed out after " + elapsed + "ms");
+			err.name = "TIMEOUT";
+			callback(err);
 		}
-		// console.log(elapsed);
+
 		elapsed = elapsed + interval;
 
-		if(self.receivedSize>=match.length){
-			if(bufferEqual(self.received.slice(0,match.length), match)){
-				console.log(match.toString('hex') + "==" + self.received.slice(0,self.receivedSize).toString('hex'))
-				self.received = new Buffer(300);
-				self.receivedSize = 0;
-				clearInterval(timer);
-				callback(null);
-			}
-			else{
-				console.log(match.toString('hex') + "!=" + self.received.slice(0,self.receivedSize).toString('hex'))
-				var received_copy = new Buffer(self.receivedSize);
-				self.received.copy(received_copy);
-				self.received = new Buffer(300);
-				self.receivedSize = 0;
-				clearInterval(timer);
-				callback(received_copy);
-			}
+		if(self.receivedSize>=numberBytes){
+			clearInterval(timer);
+			var received_copy = new Buffer(self.receivedSize);
+			self.received.copy(received_copy);
+			self.received = new Buffer(300);
+			self.receivedSize = 0;
+			callback(null, received_copy);
+
 		}
 	}
 };
@@ -1664,15 +1686,11 @@ stk500.prototype.sync = function(attempts, done) {
 			console.log("confirm sync");
 			self.matchReceive(new Buffer([Resp_STK_INSYNC, Resp_STK_OK]), timeout, function(error){
 				if(error) {
-					if(typeof error === Buffer){
-						console.log("no match");
-						done(error);
-					}else if(tries<=attempts){
+					if(tries<=attempts){
 						console.log("failed attempt again");
 						attempt();
 					}else{
-						console.log("failed all attempts");
-						done("no response");
+						done(error);
 					}
 				}else{
 					console.log("confirmed sync");
@@ -1681,6 +1699,48 @@ stk500.prototype.sync = function(attempts, done) {
 			});
 		});
 	}
+};
+
+stk500.prototype.verifySignature = function(signature, done) {
+	console.log("verify signature");
+	var self = this;
+	var cmd = new Buffer([Cmnd_STK_READ_SIGN, Sync_CRC_EOP]);
+
+	var match = new Buffer([Resp_STK_INSYNC]);
+	match = Buffer.concat([match,signature]);
+	var end = new Buffer([Resp_STK_OK]);
+	match = Buffer.concat([match,end]);
+
+	console.log(cmd.toString('hex'));
+	this.serialPort.write(cmd, function(error, results){
+		console.log("confirm signature");		
+			self.matchReceive(match, timeout, function(error, response){
+				if(error){
+					if(error.name==="INVALID"){
+						done(new Error("signature doesnt match. Found: " + response.toString('hex'), error));
+					}else{
+						done(error);
+					}
+				}else{
+					done();
+				}
+		});
+	});
+};
+
+stk500.prototype.getSignature = function(done) {
+	console.log("verify signature");
+	var self = this;
+	var cmd = new Buffer([Cmnd_STK_READ_SIGN, Sync_CRC_EOP]);
+
+	console.log(cmd.toString('hex'));
+	this.serialPort.write(cmd, function(error, results){
+		console.log("confirm signature");		
+			self.getBytes(5, timeout, function(error, response){
+				console.log(response);
+				done(error, response);
+		});
+	});
 };
 
 stk500.prototype.setOptions = function(options, done) {
@@ -1695,7 +1755,6 @@ stk500.prototype.setOptions = function(options, done) {
 		});
 	});
 };
-
 
 stk500.prototype.enterProgrammingMode = function(done) {
 	console.log("send enter programming mode");
@@ -1853,6 +1912,7 @@ module.exports = function (a, b) {
 };
 
 },{"buffer":7}],6:[function(require,module,exports){
+(function (Buffer){
 var SerialPort = require("browser-serialport");
 var intel_hex = require('intel-hex');
 var stk500 = require('stk500');
@@ -1870,6 +1930,7 @@ var pageSize = 128;
 var baud = 115200;
 var delay1 = 1; //minimum is 2.5us, so anything over 1 fine?
 var delay2 = 1;
+var signature = new Buffer([0x1e, 0x95, 0x0f]);
 
 var options = {
   devicecode:0,
@@ -1923,6 +1984,7 @@ SerialPort.list(function (err, ports) {
         programmer.connect.bind(programmer),
         programmer.reset.bind(programmer,delay1, delay2),
         programmer.sync.bind(programmer, 5),
+        programmer.verifySignature.bind(programmer, signature),
         programmer.setOptions.bind(programmer, options),
         programmer.enterProgrammingMode.bind(programmer),
         programmer.upload.bind(programmer, hex, pageSize),
@@ -1963,7 +2025,8 @@ window.stk500 = {
 
 })(window);
 
-},{"async":1,"browser-serialport":2,"intel-hex":3,"stk500":4}],7:[function(require,module,exports){
+}).call(this,require("buffer").Buffer)
+},{"async":1,"browser-serialport":2,"buffer":7,"intel-hex":3,"stk500":4}],7:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *

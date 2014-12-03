@@ -15,6 +15,7 @@ var pageSize = 128;
 var baud = 115200;
 var delay1 = 1; //minimum is 2.5us, so anything over 1 fine?
 var delay2 = 1;
+var signature = new Buffer([0x1e, 0x95, 0x0f]);
 
 var options = {
   devicecode:0,
@@ -68,6 +69,7 @@ SerialPort.list(function (err, ports) {
         programmer.connect.bind(programmer),
         programmer.reset.bind(programmer,delay1, delay2),
         programmer.sync.bind(programmer, 5),
+        programmer.verifySignature.bind(programmer, signature),
         programmer.setOptions.bind(programmer, options),
         programmer.enterProgrammingMode.bind(programmer),
         programmer.upload.bind(programmer, hex, pageSize),

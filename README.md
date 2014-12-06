@@ -15,15 +15,14 @@ By default uploads StandardFirmata to the first Uno it can find. Launch the app 
 ##Make Changes:
 If you make any changes to stk500.js you'll need to rebuild. Assuming you have node already instealled, download and install dependancies with:
 ```
-npm install -g browserify
 npm install
 ```
 Then
 ```
-browserify stk500.js -o bundle.js
+npm run build
 ```
 And now you can Reload in chrome://extensions/
 
 ###CHANGELOG
-0.0.1 
+0.0.1
 first

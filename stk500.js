@@ -50,15 +50,15 @@ SerialPort.list(function (err, ports) {
 	var found = false;
   ports.forEach(function(port) {
 
-    console.log("found " + port.comName);
+    console.log("found " + port.path);
 
-    if(usbttyRE.test(port.comName))
+    if(usbttyRE.test(port.path))
     {
     	found = true;
 
-      console.log("trying" + port.comName);
+      console.log("trying" + port.path);
 
-      var serialPort = new SerialPort.SerialPort(port.comName, {
+      var serialPort = new SerialPort.SerialPort(port.path, {
         baudrate: 115200,
         // parser: SerialPort.parsers.raw
       }, false);
@@ -77,6 +77,7 @@ SerialPort.list(function (err, ports) {
         programmer.disconnect.bind(programmer)
 
       ], function(error){
+
         if(error){
           console.log("programing FAILED: " + error);
 
@@ -88,7 +89,7 @@ SerialPort.list(function (err, ports) {
       });
 
     }else{
-      console.log("skipping " + port.comName);
+      console.log("skipping " + port.path);
     }
 
   });

@@ -9,9 +9,12 @@
     "intel-hex": "^0.1.1",
     "stk500": "0.0.6"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "browserify": "^7.0.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify stk500.js -o bundle.js"
   },
   "author": "Jacob Rosenthal",
   "license": "MIT"

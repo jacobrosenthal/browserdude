@@ -4376,10 +4376,11 @@ SerialPort.list(function (err, ports) {
         programmer.setOptions.bind(programmer, options),
         programmer.enterProgrammingMode.bind(programmer),
         programmer.upload.bind(programmer, hex, pageSize),
-        programmer.exitProgrammingMode.bind(programmer),
-        programmer.disconnect.bind(programmer)
+        programmer.exitProgrammingMode.bind(programmer)
 
       ], function(error){
+
+				programmer.disconnect();
 
         if(error){
           console.log("programing FAILED: " + error);

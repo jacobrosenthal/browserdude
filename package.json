@@ -1,20 +1,21 @@
 {
   "name": "browserdude",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Upload to Arduino from Chrome",
   "main": "index.js",
   "dependencies": {
-    "async": "^0.9.0",
-    "browser-serialport": "git://github.com/jacobrosenthal/browser-serialport#jacob",
+    "chrome-serialport": "^2.0.0",
     "intel-hex": "^0.1.1",
-    "stk500": "0.0.6"
+    "stk500": "^1.0.2"
   },
   "devDependencies": {
-    "browserify": "^7.0.0"
+    "browserify": "^7.0.0",
+    "brfs": "^1.2.0",
+    "serialport-transform": "^1.0.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "browserify stk500.js -o bundle.js"
+    "build": "browserify -t brfs -t serialport-transform index.js -o bundle.js"
   },
   "author": "Jacob Rosenthal",
   "license": "MIT"

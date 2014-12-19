@@ -3,7 +3,7 @@ Upload to Arduinos from Chrome.
 
 Currently just a reference implementation of how to browserify [stk500v1](https://www.npmjs.com/package/stk500). Long term we could other programmer support like [Pinoccio's stk500v2](https://github.com/Pinoccio/js-stk500) and whitelist our app so any installed app could utilize our programming functionality to flash an arduino. For now treat as a bootstrap for creating your own Chrome Arduino app.
 
-Currently using [my fork](https://www.npmjs.com/package/chrome-serialport) of (@garrows browser-serialport](https://www.npmjs.com/package/browser-serialport) as it more closely matches [serialport](https://www.npmjs.com/package/serialport).
+Currently using [my fork](https://www.npmjs.com/package/chrome-serialport) of [@garrows browser-serialport](https://www.npmjs.com/package/browser-serialport) as it more closely matches [serialport](https://www.npmjs.com/package/serialport).
 
 ##INSTALL
 Go to chrome://extensions/ and check developer mode in the upper right corner. Then load unpacked extension and choose this directory.

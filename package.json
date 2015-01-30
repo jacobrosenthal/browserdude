@@ -1,6 +1,6 @@
 {
   "name": "browserdude",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Upload to Arduino from Chrome",
   "main": "index.js",
   "dependencies": {

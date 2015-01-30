@@ -1,7 +1,7 @@
 {
    "app": {
       "background": {
-         "scripts": [ "background.js"]
+         "scripts": [ "main.bundle.js"]
       }
    },
    "description": "Upload to Arduino from Chrome",
